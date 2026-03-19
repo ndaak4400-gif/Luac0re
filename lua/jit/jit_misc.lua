@@ -38,3 +38,17 @@ function jit_send_recv_fd(target_fd, jit_src_sock, main_dest_sock)
     
     return received_fd
 end
+
+function jit_get_memory_info(addr, info_buf)
+    local ret = jit_sceKernelVirtualQuery(addr, 0, info_buf, 0x48)
+    if ret ~= 0 then
+        send_notification("jit_sceKernelVirtualQuery error: " .. jit_get_error_string())
+        return -1
+    end
+
+    local start = jit_read64(info_buf + 0x00)
+    local ends  = jit_read64(info_buf + 0x08)
+    local size  = ends - start
+
+    return start, size
+end

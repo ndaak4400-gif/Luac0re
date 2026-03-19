@@ -57,14 +57,10 @@ function show_dialog(message)
     local msg_param_addr = DIALOG_SCRATCH + 0x88
     
     -- Zero dialog_param buffer
-    for i = 0, 0x87 do
-        write8(dialog_param_addr + i, 0)
-    end
+    memset(dialog_param_addr, 0, 0x87)
     
     -- Zero msg_param buffer
-    for i = 0, 0x1F do
-        write8(msg_param_addr + i, 0)
-    end
+    memset(msg_param_addr, 0, 0x1F)
     
     -- Calculate magic (32-bit address)
     local magic = (0xC0D1A109 + dialog_param_addr) & 0xFFFFFFFF
@@ -353,11 +349,11 @@ end
 
 function write_shellcode(dest, str)
     local shellcode = hex_to_binary(str)
-    if #shellcode < 0x400000 then
-        write_buffer(VU1_HEAP_BASE, shellcode)
-        jit_memcpy(dest, VU1_HEAP_BASE, #shellcode)
+    if #shellcode < 0x50000 then
+        write_buffer(SHELLCODE_SCRATCH, shellcode)
+        jit_memcpy(dest, SHELLCODE_SCRATCH, #shellcode)
     else
-        error("shellcode is larger than 4MB byte")
+        error("shellcode is larger than 0x50000 bytes")
     end
 end
 
