@@ -349,11 +349,11 @@ end
 
 function write_shellcode(dest, str)
     local shellcode = hex_to_binary(str)
-    if #shellcode < 0x50000 then
+    if #shellcode < 0x400000 then
         write_buffer(SHELLCODE_SCRATCH, shellcode)
         jit_memcpy(dest, SHELLCODE_SCRATCH, #shellcode)
     else
-        error("shellcode is larger than 0x50000 bytes")
+        error("shellcode is larger than 0x400000 bytes")
     end
 end
 
