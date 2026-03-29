@@ -148,7 +148,11 @@ function poops_ps5()
     send_notification("Luac0re poops 1.1 by egycnq")
 
     if not fw_offsets then
-        error("Update Luac0re to at least 2.2 version")
+        error("Update Luac0re to at least 2.2b version")
+    end
+    
+    if gpu.close then
+        error("Update Luac0re to at least 2.2b version")
     end
 
     if PLATFORM ~= "PS5" then
